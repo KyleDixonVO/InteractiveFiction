@@ -24,7 +24,7 @@ namespace InteractiveFiction
         {
             story[0,0,0] = "Shotty Game Studios:--------------------";
             story[1,0,0] = "You wake on a damp bed of leaves. Your head pounds, how did you get here?:To the north you see a satchel on the ground.:To the south you see a rope leading over the edge of a cliff.";
-            story[1,0,1] = "You walk over to the bag, it smells of potent rot,the leather is slimy. The bag pulses slightly.:";
+            story[1,0,1] = "You walk over to the bag, it smells of potent rot,the leather is slimy. The bag pulses slightly.: Take The Bag? Leave The Bag?";
             story[1,0,2] = "You walk to the edge of the cliff and grab the rope, you descend to the base of the cliff.:";
             story[1,1,1] = "You pick up the bag, it is warm to the touch, the leather ripples under your fingertips.You go to open the bag, but are met with a roiling sense of unease. Maybe the bag should stay closed.";
             story[1,1,2] = "You decide to leave the bag, it’s gross and you’re pretty sure it’s not yours. You turn to leave, and you begin to hear whispers behind you. Don’t leave us.";
