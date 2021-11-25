@@ -9,23 +9,23 @@ namespace InteractiveFiction
 {
     class Program
     {
-        static string[] story = new string[64];
-        static string[] sentences;
-        static char playerInput;
-        static int choiceA;
-        static int choiceB;
-        static bool gameOver = false;
-        static char delimiter = ':';
+        static string[] story = new string[64]; //stores story pages
+        static string[] sentences; //used to split story pages
+        static char playerInput; //stores char of player input
+        static int choiceA; //stores the page number of the first choice
+        static int choiceB; //stores the page number of the second choice
+        static bool gameOver = false; //checks if the game should end
+        static char delimiter = ':'; //where story pages are split
         static string[] keyWords = new string[3]; //for coloring the text
-        static string[] lines;
-        static int page = 0;
+        static string[] lines; //used to split sentences
+        static int page = 0; //defaults page number to zero
         
 
 
 
-        static void PageList()
+        static void PageList() //list of all story pages, will be moved to a file later.
         {
-            story[0] = "Shotty Game Studios\nInteractive Fiction\n--------------------\n#A or B. Start Game.:1:1";
+            story[0] = "Shotty Game Studios\nWhispers\n--------------------\n#A or B. Start Game.:1:1";
             story[1] = "You wake on a damp bed of leaves. Your head pounds, how did you get here?\nTo the north you see a satchel on the ground.To the south you see a rope leading over the edge of a cliff.\n#A. Go North\n#B. Go South:2:3";
             story[2] = "You walk over to the bag, it smells of potent rot,the leather is slimy.\nThe bag pulses slightly.\n#A. Take The Bag?\n#B.Leave The Bag? :4:5";
             story[3] = "You walk to the edge of the cliff and grab the rope, you descend to the base of the cliff.\n A or B. Descend.:8:8";
@@ -38,24 +38,24 @@ namespace InteractiveFiction
 
             story[63] = "You've died horribly. That really sucks.\nA or B. Try again.:1:1";
         }
-        static void PlayerActions()
+        static void PlayerActions() //gets the key pressed by the user and performs a task if the input is valid.
         {
 
             playerInput = Console.ReadKey(true).KeyChar;
 
-            if (playerInput == 'a')
+            if (playerInput == 'a' || playerInput == 'A')
             {
                 page = choiceA;
             }
-            else if (playerInput == 'b')
+            else if (playerInput == 'b' || playerInput == 'B')
             {
                 page = choiceB;
             }
-            else if (playerInput == 'c')
+            else if (playerInput == 'c' || playerInput == 'C')
             {
                 //Save Game
             }
-            else if (playerInput == 'd')
+            else if (playerInput == 'd' || playerInput == 'D')
             {
                //Load Game
             }
@@ -67,34 +67,41 @@ namespace InteractiveFiction
             
         }
         
-        static void Bookmark()
-        {
+        static void GetPageNumbers() //splits story pages at the delimter, parses page numbers into ints to be used in the player input method.
+        {                           //These writelines are for debugging and should be disabled before creating a build
             Console.WriteLine();
             Console.WriteLine("Page: " + (page));
-            sentences = story[page].Split(delimiter);
-            Console.WriteLine("Sentence Length:" + (sentences.Length));
-            Console.WriteLine("Page:" + page);
-            Console.WriteLine("A Mod:" + (sentences.Length-2));
-            Console.WriteLine("B Mod:" + (sentences.Length - 1));
-            Console.WriteLine("A Before:" + choiceA);
-            Console.WriteLine("B Before: " + choiceB);
-            string testA = sentences[sentences.Length-2];
-            choiceA = int.Parse(testA);
-            Console.WriteLine("Choice A:" + choiceA);
-            string testB = sentences[sentences.Length-1];
-            choiceB = int.Parse(testB);
-            Console.WriteLine("Choice B:" + choiceB);
-            Console.WriteLine();
+            sentences = story[page].Split(delimiter); //splits the current story page at every colon and stores it in the sentences array
+            string testA = sentences[sentences.Length-2]; //stores the value of the second last sentence as a string to be parsed
+            bool isIntA = int.TryParse(testA, out int hasIntA);
+            if (isIntA == true)
+            {
+                choiceA = int.Parse(testA); //parses the second last string into int
+            }
+            else
+            {
+                gameOver = true;
+            }
+            string testB = sentences[sentences.Length - 1]; //stores the value of the last sentence as a string to be parsed
+            bool isIntB = int.TryParse(testB, out int hasIntB);
+            if(isIntB == true)
+            {
+                choiceB = int.Parse(testB); //parses the last string into int
+            }
+            else
+            {
+                gameOver = true;
+            }
         }
 
-        static void Scribe() //writes the appropriate story page
+        static void Scribe() //writes the appropriate story page, needs to be reworked to properly display color
         {
             Console.WriteLine(sentences[0]);
         }
 
-        static void ChangeTextColor() //method to color individual lines based on keywords (in progress)
+        static void ChangeTextColor() //method to color individual lines based on keywords (work in progress)
         {
-            lines = sentences[0].Split('\n'); //splitting the string at each new line
+            lines = sentences[0].Split('\n'); //splitting the sentence at each new line
             keyWords[0] = "#A";
             keyWords[1] = "#B";
             keyWords[2] = "#A or B";
@@ -117,17 +124,46 @@ namespace InteractiveFiction
             }
         }
 
+        static void MainMenu() //simple main menu, want to add load and save functionality later
+        {
+            Console.BackgroundColor = ConsoleColor.DarkMagenta;
+            Console.Clear();
+            Console.WriteLine("");
+            Console.WriteLine("▄█     █▄     ▄█    █▄     ▄█     ▄████████    ▄███████▄    ▄████████    ▄████████    ▄████████");
+            Console.WriteLine("███     ███   ███    ███   ███    ███    ███   ███    ███   ███    ███   ███    ███   ███    ███ ");
+            Console.WriteLine("███     ███   ███    ███   ███▌   ███    █▀    ███    ███   ███    █▀    ███    ███   ███    █▀ ");
+            Console.WriteLine("███     ███  ▄███▄▄▄▄███▄▄ ███▌   ███          ███    ███  ▄███▄▄▄      ▄███▄▄▄▄██▀   ███        ");
+            Console.WriteLine("███     ███ ▀▀███▀▀▀▀███▀  ███▌ ▀███████████ ▀█████████▀  ▀▀███▀▀▀     ▀▀███▀▀▀▀▀   ▀███████████ ");
+            Console.WriteLine("███     ███   ███    ███   ███           ███   ███          ███    █▄  ▀███████████          ███");
+            Console.WriteLine("███ ▄█▄ ███   ███    ███   ███     ▄█    ███   ███          ███    ███   ███    ███    ▄█    ███");
+            Console.WriteLine(" ▀███▀███▀    ███    █▀    █▀    ▄████████▀   ▄████▀        ██████████   ███    ███  ▄████████▀");
+            Console.WriteLine("                                                                         ███    ███             ");
+            Console.WriteLine();
+            Console.WriteLine("Press any key to start.");
+            Console.ReadKey(true);
+            Console.ResetColor();
+            Console.Clear();
+        }
+
+        static void EndGame()
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Game Over!");
+            Console.ResetColor();
+            Console.ReadKey(true);
+        }
         static void Main(string[] args)
         {
+           MainMenu();
            while(gameOver == false)
            {
                 PageList();
-                Bookmark();
+                GetPageNumbers();
                 //ChangeTextColor();
                 Scribe();
-                PlayerActions();
-                
-           }   
+                PlayerActions();  
+           }
+            EndGame();
         }
     }
 }
