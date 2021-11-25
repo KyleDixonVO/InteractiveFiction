@@ -16,7 +16,7 @@ namespace InteractiveFiction
         static int choiceB;
         static bool gameOver = false;
         static char delimiter = ':';
-        static string[] keyWords = new string[3];
+        static string[] keyWords = new string[3]; //for coloring the text
         static string[] lines;
         static int page = 0;
         
@@ -78,10 +78,10 @@ namespace InteractiveFiction
             Console.WriteLine("B Mod:" + (sentences.Length - 1));
             Console.WriteLine("A Before:" + choiceA);
             Console.WriteLine("B Before: " + choiceB);
-            string testA = sentences[1];
+            string testA = sentences[sentences.Length-2];
             choiceA = int.Parse(testA);
             Console.WriteLine("Choice A:" + choiceA);
-            string testB = sentences[2];
+            string testB = sentences[sentences.Length-1];
             choiceB = int.Parse(testB);
             Console.WriteLine("Choice B:" + choiceB);
             Console.WriteLine();
@@ -103,7 +103,6 @@ namespace InteractiveFiction
                 string scraper = line;
                 foreach (string keyWord in keyWords) //comparing the line against each keyword in keywords
                 {
-
                     bool containsKeyword = scraper.Contains(keyWord); //the check
                     if (containsKeyword == true)
                     {
@@ -124,7 +123,7 @@ namespace InteractiveFiction
            {
                 PageList();
                 Bookmark();
-                ChangeTextColor();
+                //ChangeTextColor();
                 Scribe();
                 PlayerActions();
                 
