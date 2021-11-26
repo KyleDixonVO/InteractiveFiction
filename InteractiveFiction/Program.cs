@@ -20,7 +20,7 @@ namespace InteractiveFiction
         static string[] lines; //used to split sentences
         static int page = 0; //defaults page number to zero
         
-
+        //Some story options will utilize inventory items/tracked gamestate events (to be implemented later)
 
 
         static void PageList() //list of all story pages, will be moved to a file later.
@@ -68,7 +68,7 @@ namespace InteractiveFiction
         }
         
         static void GetPageNumbers() //splits story pages at the delimter, parses page numbers into ints to be used in the player input method.
-        {                           //These writelines are for debugging and should be disabled before creating a build
+        {                           
             Console.WriteLine();
             Console.WriteLine("Page: " + (page));
             sentences = story[page].Split(delimiter); //splits the current story page at every colon and stores it in the sentences array
