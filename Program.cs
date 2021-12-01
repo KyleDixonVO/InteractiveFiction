@@ -54,7 +54,7 @@ namespace InteractiveFiction
             }
             else if (playerInput == ConsoleKey.Escape)
             {
-                gameOver = true;
+                Environment.Exit(0);
             }
             else
             {
@@ -195,7 +195,7 @@ namespace InteractiveFiction
             Console.ResetColor();
             Console.Clear();
         }
-        static void EndGame() //Displays game over message and ends the game.
+        static void GameOver() //Displays game over message and ends the game.
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Game Over");
@@ -214,7 +214,7 @@ namespace InteractiveFiction
                 TextManager();
                 PlayerActions();
             }
-            EndGame();
+            GameOver();
         }
         static void TitleText()
         {
