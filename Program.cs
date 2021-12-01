@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.IO;
 
 
@@ -18,119 +19,207 @@ namespace InteractiveFiction
         static bool gameOver = false; //checks if the game should end
         static char delimiter = ':'; //where story pages are split
         static string[] keyWords = new string[3]; //for coloring the text
-        static int page; //defaults page number to zero
-        static int optionSelected = 0;
-        static bool waitingForEnter = false;
-        static string useablePath;
-
-        //Some story options will utilize inventory items/tracked gamestate events (to be implemented later).
-        //I plan to make my story require multiple loops through the choices, where some options are only available after certain conditions are met.
-
-
+        static int page = 1; //defaults page number to one
+        static int optionSelected = 0; //default main menu option
+        static bool waitingForEnter = false; //used to confirm main menu input
+        static string useablePath; //stores the path of the game folder
+        static string testA; //stores second last sentence in split
+        static bool isIntA; //used to test if second last split contains an integer
+        static bool isIntB; //used to test if last split contains an integer
 
         static void PlayerActions() //gets the key pressed by the user and performs a task if the input is valid.
         {
-            Console.WriteLine("");
-            Console.WriteLine("Awaiting choice. A/B: Story Options. C: Save Game. D: Load Game. Esc: Exit Game.");
-            playerInput = Console.ReadKey(true).Key;
+           if (isIntA && isIntB)
+           {
+                if(choiceB == choiceA)
+                {
+                    QuickMenuColor();
+                    Console.WriteLine("");
+                    Console.WriteLine("Awaiting Choice. C: Save Game. D: Load Game. Esc: Exit Game. Any other key: Continue.");
+                    Console.ResetColor();
+                    playerInput = Console.ReadKey(true).Key;
 
-            if (playerInput == ConsoleKey.A)
-            {
-                page = choiceA;
-                Console.Beep(625, 100);
-            }
-            else if (playerInput == ConsoleKey.B)
-            {
-                page = choiceB;
-                Console.Beep(525, 100);
-            }
-            else if (playerInput == ConsoleKey.C)
-            {
-                SaveGame();
-            }
-            else if (playerInput == ConsoleKey.D)
-            {
-                LoadGame();
-            }
-            else if (playerInput == ConsoleKey.Escape)
-            {
-                Environment.Exit(0);
-            }
-            else
-            {
-                Console.WriteLine("Invalid input, please choose from a valid input");
-                PlayerActions();
-            }
+                    if(playerInput == ConsoleKey.C)
+                    {
+                        Console.Beep(575, 100);
+                        SaveGame();
+                    }    
+                    else if(playerInput == ConsoleKey.D)
+                    {
+                        Console.Beep(575, 100);
+                        LoadGame();
+                    }
+                    else if(playerInput == ConsoleKey.Escape)
+                    {
+                        Environment.Exit(0);
+                    }
+                    else
+                    {
+                        Console.Beep(575, 100);
+                        page = choiceA;
+                    }
+
+                }
+                else
+                {
+                    QuickMenuColor();
+                    Console.WriteLine("");
+                    Console.WriteLine("Awaiting choice. A: First Choice. B: Second Choice. C: Save Game. D: Load Game. Esc: Exit Game.");
+                    Console.ResetColor();
+                    playerInput = Console.ReadKey(true).Key;
+
+                    if (playerInput == ConsoleKey.A)
+                    {
+                    page = choiceA;
+                    Console.Beep(625, 100);
+                    }
+                    else if (playerInput == ConsoleKey.B)
+                    {
+                        page = choiceB;
+                        Console.Beep(525, 100);
+                    }
+                    else if (playerInput == ConsoleKey.C)
+                    {
+                        Console.Beep(575, 100);
+                        SaveGame();
+                    }
+                    else if (playerInput == ConsoleKey.D)
+                    {
+                        Console.Beep(575, 100);
+                        LoadGame();
+                    }
+                    else if (playerInput == ConsoleKey.Escape)
+                    {
+                        Environment.Exit(0);
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.BackgroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Invalid input, please choose from a valid input");
+                        Console.ResetColor();
+                        PlayerActions();
+                    }
+                }
+                
+           }
+           else
+           {
+                QuickMenuColor();
+                Console.WriteLine("Press Any Key to Continue");
+                Console.ResetColor();
+                Console.ReadKey(true);
+                Console.Beep(575, 100);
+                gameOver = true;
+           }
+           
 
         }
         static void GetPageNumbers() //splits story pages at the delimter, parses page numbers into ints to be used in the player input method.
-        {
-            Console.WriteLine();
-            Console.WriteLine("Page: " + (page));
-            sentences = story[page].Split(delimiter); //splits the current story page at every colon and stores it in the sentences array
-            string testA = sentences[sentences.Length - 2]; //stores the value of the second last sentence as a string to be parsed
-            bool isIntA = int.TryParse(testA, out int hasIntA);
+        {   
+            try
+            {
+             sentences = story[page].Split(delimiter); //splits the current story page at every colon and stores it in the sentences array
+            }
+            catch
+            {
+              page++;
+            }
+           
+            try
+            {
+            testA = sentences[sentences.Length - 2]; //stores the value of the second last sentence as a string to be parsed
+            }
+            catch
+            {
+                isIntA = false;
+                return;
+            }
+            isIntA = int.TryParse(testA, out int hasIntA);
             if (isIntA == true)
             {
                 choiceA = int.Parse(testA); //parses the second last string into int
             }
-            else
-            {
-                gameOver = true;
-            }
             string testB = sentences[sentences.Length - 1]; //stores the value of the last sentence as a string to be parsed
-            bool isIntB = int.TryParse(testB, out int hasIntB);
+            isIntB = int.TryParse(testB, out int hasIntB);
             if (isIntB == true)
             {
                 choiceB = int.Parse(testB); //parses the last string into int
             }
-            else
-            {
-                gameOver = true;
-            }
         }
-        static void TextManager() //Checks sentences against a set of keywords to determine if they should receive color, then writes sentences.
+        static void TextManager() //writes story text and manages text color
         {
-            keyWords[0] = "#A";
-            keyWords[1] = "#B";
-            keyWords[2] = "#A or B";
-            for (int i = 0; i < sentences.Length-2; i++) //checking each line in the array lines[]
+            Console.Clear();
+            if (page != 0) //checks if the title page is up, if not, writes page number
             {
-                foreach (string keyWord in keyWords) //comparing the line against each keyword in keywords
+                Console.WriteLine("");
+                QuickMenuColor();
+                Console.WriteLine("Page: " + (page));
+                Console.ResetColor();
+                Console.WriteLine("");
+            }
+
+            if(!(isIntA == true && isIntB == true))
+            {
+                for (int k = 0; k < sentences.Length - 2; k++)
                 {
-                    bool containsKeyword = sentences[i].Contains(keyWord); //the check
-                    if (containsKeyword == true)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Green; //sets text color to green
-                        break;
-                    }
-                    else
-                    {
-                        Console.ResetColor();
-                    }
+                    Console.WriteLine(sentences[k]);
+                    Thread.Sleep(100);
                 }
-                Console.WriteLine(sentences[i]);
+                Console.WriteLine("");
+            }
+            else if(choiceA == choiceB) //checks if there is only one option available
+            { 
+                 for (int i = 0; i < sentences.Length-3; i++) //writes all sentences up to the third from last (only choice)
+                 {
+                    Console.WriteLine(sentences[i]);
+                    Thread.Sleep(100);
+                 }
+
+                Console.WriteLine(""); //changes text color and writes third from last sentence (only choice)
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine(sentences[sentences.Length-3]);
                 Console.ResetColor();
             }
+            else
+            {
+                for (int j = 0; j < sentences.Length-4; j++) //writes all sentences up to fourth from last (first choice)
+                {
+                    Console.WriteLine(sentences[j]);
+                    Thread.Sleep(100);
+                }
+                Console.WriteLine(""); //writes last two sentences after changing color
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("First Choice: " + sentences[sentences.Length-4]);
+                Console.ResetColor();
+                Thread.Sleep(100);
+                Console.WriteLine("");
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("Second Choice: " + sentences[sentences.Length-3]);
+                Console.ResetColor();
+                Thread.Sleep(100);
+            }
+           
         }
         static void MainMenu() //Splash screen with simple cursor input.
         {
-            Console.BackgroundColor = ConsoleColor.DarkMagenta;
+            Console.BackgroundColor = ConsoleColor.DarkMagenta; //Changes background color
             Console.Clear();
             TitleText();
+            Console.WriteLine("Shotty Game Studios\n--------------------");
 
-            Console.WriteLine("     New Game");
+            Console.WriteLine("     New Game");  //available game options
             Console.WriteLine("     Load Game");
             Console.WriteLine("     Quit Game");
-            Console.SetCursorPosition(2, 11);
+            Console.SetCursorPosition(2, 13); //setting cursor position behind "new game"
             Console.Write("->");
 
 
-            while (waitingForEnter == false)
+            while (waitingForEnter == false) //checking if enter has been pressed
             {
-                Console.CursorVisible = false;
-                ConsoleKey moveCursor = Console.ReadKey(true).Key;
-                if (moveCursor == ConsoleKey.W)
+                Console.CursorVisible = false; //sets cursor false
+                ConsoleKey moveCursor = Console.ReadKey(true).Key; //gets key pressed
+                if (moveCursor == ConsoleKey.W) //moves cursor up on "W" press, plays beep
                 {
                     if (optionSelected > 0)
                     {
@@ -138,7 +227,7 @@ namespace InteractiveFiction
                         optionSelected--;
                     }
                 }
-                else if (moveCursor == ConsoleKey.S)
+                else if (moveCursor == ConsoleKey.S) //moves cursor down on "S" press, plays beep
                 {
                     if (optionSelected < 2)
                     {
@@ -147,55 +236,56 @@ namespace InteractiveFiction
                     }
                 }
 
-                if (optionSelected == 0)
+                if (optionSelected == 0) //defines cursor positions for the three available options
                 {
-                    Console.SetCursorPosition(2, 12);
+                    Console.SetCursorPosition(2, 14);
                     Console.Write("  ");
-                    Console.SetCursorPosition(2, 11);
+                    Console.SetCursorPosition(2, 13);
                     Console.Write("->");
                 }
                 else if (optionSelected == 1)
                 {
-                    Console.SetCursorPosition(2, 11);
-                    Console.Write("  ");
                     Console.SetCursorPosition(2, 13);
                     Console.Write("  ");
-                    Console.SetCursorPosition(2, 12);
+                    Console.SetCursorPosition(2, 14);
+                    Console.Write("  ");
+                    Console.SetCursorPosition(2, 15);
                     Console.Write("->");
                 }
                 else if (optionSelected == 2)
                 {
-                    Console.SetCursorPosition(2, 12);
+                    Console.SetCursorPosition(2, 14);
                     Console.Write("  ");
-                    Console.SetCursorPosition(2, 13);
+                    Console.SetCursorPosition(2, 15);
                     Console.Write("->");
                 }
 
                 ConsoleKey enterPress = moveCursor;
-                if(enterPress == ConsoleKey.Enter)
+                if(enterPress == ConsoleKey.Enter) //when enter is pressed, executes highlighted option, plays beep
                 { 
-                    if (optionSelected == 0)
+                    Console.Beep(575, 100);
+                    if (optionSelected == 0) //starts new game
                     {
                         break;
                     }
-                    else if (optionSelected == 1)
+                    else if (optionSelected == 1) //goes to load menu
                     {
                         Console.ResetColor();
                         Console.Clear();
                         LoadGame();
                         break;
                     }
-                    else if (optionSelected == 2)
+                    else if (optionSelected == 2) //closes program
                     {
                         gameOver = true;
                         break;
                     }
                 }
             }
-            Console.ResetColor();
+            Console.ResetColor(); //resets color and clears screen
             Console.Clear();
         }
-        static void GameOver() //Displays game over message and ends the game.
+        static void GameOver() //Displays game over message and exits to main menu.
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Game Over");
@@ -207,7 +297,7 @@ namespace InteractiveFiction
         {
             GetFilePath();
             MainMenu();
-            while (gameOver == false) //gameplay loop, gets page data, parses the page numbers from the data, writes the relevant text to the screen, then waits for player input.
+            while (gameOver == false) //gameplay loop: gets page data, parses the page numbers from the data, writes the relevant text to the screen, then waits for player input.
             {
                 ReadStoryTxt();
                 GetPageNumbers();
@@ -318,5 +408,9 @@ namespace InteractiveFiction
                 }
             }
         } //Gets local file path for SaveGame, LoadGame, and ReadStoryText.
+        static void QuickMenuColor() //Sets foreground color to green
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+        }
     }
 }
