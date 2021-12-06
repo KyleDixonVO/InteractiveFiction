@@ -2,25 +2,51 @@ Ensure that all page numbers are listed after the last two colons ":", at the en
 If the page has a single option, use the same page number twice. 							EXAMPLE:	your story here :choice :1:1     
 If the page is an end state, do not add a choice or page numbers, leave two colons on the end. 				EXAMPLE:	your end here :: 
 If you would like to include a foreword replace the line of dashes below with your text.
+
+
+
+
 --------------------------------------------------------------------------------------------------Whispers-----------------------------------------------------------------------------------------------------------------------
+
+
+
+
 You wake on a damp bed of leaves. Your head pounds, how did you get here?:To the north you see a satchel on the ground.:To the south you see a rope leading over the edge of a cliff.:Go North.:Go South.:2:3
+
 You walk over to the bag, it smells of potent rot,the leather is slimy.:The bag pulses slightly.:Take The Bag?:Leave The Bag? :4:5
+
 You walk to the edge of the cliff and grab the rope, taking a second to secure your satchel.:Was it always there? You think so. :You descend to the base of the cliff.:Descend.:8:8
+
 You pick up the bag, it is warm to the touch, the leather ripples under your fingertips. :You go to open the bag, but are met with a roiling sense of unease. :Maybe the bag should stay closed.:Go to cliff edge.:3:3
+
 You decide to leave the bag, it's gross and you're pretty sure it's not yours. :You turn to leave, and you begin to hear whispers behind you. :"Don't leave us.":Turn Around.:Run.:6:7
+
 You turn around to investigate the source of the whispers. :You don't see anyone. :The whispers grow louder, your head starts to hurt… :A familiar bag rests at your side.:Go to cliff edge.:3:3
+
 You run from the whispers, you run to the edge of the cliff and try to grab the rope. :It slips from your fingers as you tumble over the edge.::
+
 The forest is thick here, mist hangs close to the ground. :In the distance you hear a low hum.:Go East.:Go West.:9:10
+
 You walk east, and eventually come upon a small pond.:The mist makes it hard to see, but you can make out your reflection in the water.:Look Closer.:Walk Around The Bank.:11:12
+
 You walk west, the humming begins to grow louder, and louder, until your form resonates with it.:You travel further west, you see an altar nestled amongst the roots and underbrush, upon it rests a basin of fluid.:The Hum is intoxicating. You step up to the altar.:Drink. :Kneel.:15:16
+
 You peer closer to the water, trying to get a better look at your reflection.:You get closer and closer to the water, and stop.:The face does not stop, and the creature below pulls you into the murky embrace of the pond.::
+
 You walk around the bank of the pond, noticing scattered fragments of bone at your feet.:You hear something in the water.:You turn to see a warped lanky humanoid, it looks at you hungrily.:Throw the satchel.:Flee.:13:14
-You reach for the satchel, it pulses faster now.:Is it afraid? You throw the satchel, it hits the humanoid and lands at it's feet.:The creature picks up the bag and takes a bite, your head throbs in pain.:Remember.:21:21
+
+You reach for the satchel, it pulses faster now.:Is it afraid? You throw the satchel, it hits the humanoid and lands at it's feet.:The creature picks up the bag and takes a bite, your head throbs in pain.:Remember.:20:20
+
 You tear off into the forest, you can hear it crashing through the trees behind you.:Eventually you think you've lost it.:You hear the hum to your west.:You can also make out a standing stone to your north.:Go West. :Go North. :10:17
-You drink the fluid, but this communion does not absolve your guilt.:You start to remember, your head pounds.:Remember.:21:21
+
+You drink the fluid, but this communion does not absolve your guilt.:You start to remember, your head pounds.:Remember.:20:20
+
 You kneel at the altar, head bowed... You have not atoned.:The basin spills.:Your guilt eats you alive.::
+
 You walk towards the standing stone, it marks a simple grave, recently filled.:Read the headstone.:Mourn. :18:19 
-The stone is simply cut, there are no dates on the stone, just a name.:Your name.:Your vision blurs, your head burns with searing pain.:Remember.:21:21
+
+The stone is simply cut, there are no dates on the stone, just a name.:Your name.:Your vision blurs, your head burns with searing pain.:Remember.:20:20
+
 You look at the photo you keep in your pocket, and you're reminded of simpler times.:You lay the photo on the headstone, the pain in your head eases slightly.:You release your guilt.::
 
 The truth whispers to you. Maybe you'll discover it someday.::

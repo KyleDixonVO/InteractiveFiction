@@ -125,10 +125,10 @@ namespace InteractiveFiction
             {
               page++;
             }
-           
+
             try
             {
-            testA = sentences[sentences.Length - 2]; //stores the value of the second last sentence as a string to be parsed
+                testA = sentences[sentences.Length - 2]; //stores the value of the second last sentence as a string to be parsed
             }
             catch
             {
@@ -139,12 +139,24 @@ namespace InteractiveFiction
             if (isIntA == true)
             {
                 choiceA = int.Parse(testA); //parses the second last string into int
+                if (choiceA > story.Length || choiceA < 0)
+                {
+                    Console.WriteLine("Page "+ page +" reference numbers are invalid, please check the integrity of story.txt");
+                    Console.ReadKey(true);
+                    Environment.Exit(0);
+                }
             }
             string testB = sentences[sentences.Length - 1]; //stores the value of the last sentence as a string to be parsed
             isIntB = int.TryParse(testB, out int hasIntB);
             if (isIntB == true)
             {
                 choiceB = int.Parse(testB); //parses the last string into int
+                if (choiceB > story.Length || choiceB < 0)
+                {
+                    Console.WriteLine("Page "+ page +" reference numbers are invalid, please check the integrity of story.txt");
+                    Console.ReadKey(true);
+                    Environment.Exit(0);
+                }
             }
         }
         static void TextManager() //writes story text and manages text color
@@ -204,6 +216,7 @@ namespace InteractiveFiction
         static void MainMenu() //Splash screen with simple cursor input.
         {
             Console.BackgroundColor = ConsoleColor.DarkMagenta; //Changes background color
+            gameOver = false;
             Console.Clear();
             TitleText();
             Console.WriteLine("Shotty Game Studios\n--------------------");
@@ -247,9 +260,9 @@ namespace InteractiveFiction
                 {
                     Console.SetCursorPosition(2, 13);
                     Console.Write("  ");
-                    Console.SetCursorPosition(2, 14);
-                    Console.Write("  ");
                     Console.SetCursorPosition(2, 15);
+                    Console.Write("  ");
+                    Console.SetCursorPosition(2, 14);
                     Console.Write("->");
                 }
                 else if (optionSelected == 2)
@@ -266,6 +279,10 @@ namespace InteractiveFiction
                     Console.Beep(575, 100);
                     if (optionSelected == 0) //starts new game
                     {
+                        Console.ResetColor();
+                        Console.Clear();
+                        page = 1;
+                        GameplayLoop();
                         break;
                     }
                     else if (optionSelected == 1) //goes to load menu
@@ -295,15 +312,9 @@ namespace InteractiveFiction
         }
         static void Main() //Main game loop.
         {
-            GetFilePath();
+            //GetFilePath();
             MainMenu();
-            while (gameOver == false) //gameplay loop: gets page data, parses the page numbers from the data, writes the relevant text to the screen, then waits for player input.
-            {
-                ReadStoryTxt();
-                GetPageNumbers();
-                TextManager();
-                PlayerActions();
-            }
+            GameplayLoop();
             GameOver();
         }
         static void TitleText()
@@ -322,16 +333,16 @@ namespace InteractiveFiction
         } //Holds ASCII art for the main menu.
         static void ReadStoryTxt()
         {
-            string storyTXT = "InteractiveFiction\\story.txt";
-            if (!File.Exists(@useablePath + storyTXT))
+            string storyTXT = "story.txt";
+            if (!File.Exists(storyTXT))
             {
-                Console.WriteLine("story.txt cannot be found @" + useablePath + storyTXT + ". Please ensure story.txt has not been moved or renamed.");
+                Console.WriteLine("story.txt cannot be found @"+storyTXT+". Please ensure story.txt has not been moved or renamed.");
                 Console.ReadKey(true);
                 Environment.Exit(0);
             }
             else
             {
-                story = File.ReadLines(@useablePath + storyTXT).Skip(4).ToArray();
+                story = File.ReadLines(storyTXT).Skip(4).Where(line => line != "").ToArray();
             }    
         } //Reads pages from story.txt.
         static void LoadGame()
@@ -341,7 +352,7 @@ namespace InteractiveFiction
             if (input == ConsoleKey.Y)
             {
 
-                string[] savePoint = File.ReadAllLines(@useablePath + "InteractiveFiction\\savegame.txt").ToArray();
+                string[] savePoint = File.ReadAllLines("savegame.txt").ToArray();
                 bool containsInt = int.TryParse(savePoint[1], out int savedPage);
                 if (containsInt == true)
                 {
@@ -372,7 +383,7 @@ namespace InteractiveFiction
             ConsoleKey input = Console.ReadKey(true).Key;
             if (input == ConsoleKey.Y)
             {
-                string SavePoint = @useablePath + "InteractiveFiction\\savegame.txt";
+                string SavePoint = "savegame.txt";
 
                 
                 string[] SaveData = { "Whispers Save Data", Convert.ToString(page) };
@@ -411,6 +422,17 @@ namespace InteractiveFiction
         static void QuickMenuColor() //Sets foreground color to green
         {
             Console.ForegroundColor = ConsoleColor.Green;
+        }
+
+        static void GameplayLoop() //Stores gameloop
+        {
+            while (gameOver == false) //gameplay loop: gets page data, parses the page numbers from the data, writes the relevant text to the screen, then waits for player input.
+            {
+                ReadStoryTxt();
+                GetPageNumbers();
+                TextManager();
+                PlayerActions();
+            }  
         }
     }
 }
