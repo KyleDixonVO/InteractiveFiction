@@ -1,12 +1,8 @@
 Ensure that all page numbers are listed after the last two colons ":", at the end of all story segments. 		EXAMPLE:	your story here :choiceA. :choiceB. :1 :2 
 If the page has a single option, use the same page number twice. 							EXAMPLE:	your story here :choice :1:1     
 If the page is an end state, do not add a choice or page numbers, leave two colons on the end. 				EXAMPLE:	your end here :: 
-If you would like to include a foreword replace the line of dashes below with your text.
-
-
-
-
---------------------------------------------------------------------------------------------------Whispers-----------------------------------------------------------------------------------------------------------------------
+All lines of text after this one are processed by the game engine, blank lines (pressing enter for a new line) are filtered out and are safe to include. The line of dashes below this is a filler line so that your page numbers line up in the engine, remove it at your own risk. Do not remove this line or the lines above it.
+--------------------------------------------------------------------------------------------------Whispers-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 

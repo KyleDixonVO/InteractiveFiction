@@ -27,7 +27,7 @@ namespace InteractiveFiction
         static bool isIntA; //used to test if second last split contains an integer
         static bool isIntB; //used to test if last split contains an integer
         static string storyTXT = "story.txt";
-        static string defaultStoryHash = "53203eec2279f4a6e778a1e67d064b10102ba0157a7688f26f10d8059d8cc072";
+        static string defaultStoryHash = "644d13591ae3c5acd514037049ad8b700b205ee6ac38356c752b30cf3d164161";
         static string sgHash;
         static StringBuilder sb = new StringBuilder();
         static StringBuilder hashBuilder = new StringBuilder();
@@ -118,10 +118,12 @@ namespace InteractiveFiction
                 Console.ReadKey(true);
                 Console.Beep(575, 100);
                 gameOver = true;
+                GameOver();
            }
            
 
         }
+
         static void GetPageNumbers() //splits story pages at the delimter, parses page numbers into ints to be used in the player input method.
         {   
             try
@@ -166,6 +168,7 @@ namespace InteractiveFiction
                 }
             }
         }
+
         static void TextManager() //writes story text and manages text color
         {
             Console.Clear();
@@ -220,6 +223,7 @@ namespace InteractiveFiction
             }
            
         }
+
         static void MainMenu() //Splash screen with simple cursor input.
         {
             Console.BackgroundColor = ConsoleColor.DarkMagenta; //Changes background color
@@ -310,6 +314,7 @@ namespace InteractiveFiction
             Console.ResetColor(); //resets color and clears screen
             Console.Clear();
         }
+
         static void GameOver() //Displays game over message and exits to main menu.
         {
             Console.ForegroundColor = ConsoleColor.Red;
@@ -318,15 +323,16 @@ namespace InteractiveFiction
             Console.ReadKey(true);
             MainMenu();
         }
-        static void Main() //Main game loop.
-        {
-            //GetFilePath(); 
+
+        static void Main()
+        { 
             GetHash();
             VerifyFileIntegrity();
+            ReadStoryTxt();
             MainMenu();
             GameplayLoop();
-            GameOver();
         }
+
         static void TitleText()
         {
             Console.WriteLine("");
@@ -341,6 +347,7 @@ namespace InteractiveFiction
             Console.WriteLine("                                                                         ███    ███             ");
             Console.WriteLine("");
         } //Holds ASCII art for the main menu.
+
         static void ReadStoryTxt()
         {
             if (!File.Exists(storyTXT))
@@ -354,38 +361,56 @@ namespace InteractiveFiction
                 story = File.ReadLines(storyTXT).Skip(4).Where(line => line != "").ToArray();
             }    
         } //Reads pages from story.txt.
+
         static void LoadGame()
         {
             Console.WriteLine("Load Game? Any unsaved progress will be lost. Y/N");
             ConsoleKey input = Console.ReadKey(true).Key;
             if (input == ConsoleKey.Y)
             {
-
-                string[] savePoint = File.ReadAllLines("savegame.txt").Where(line => line != "").ToArray();
-                if (savePoint.Length < 3)
+                if (File.Exists("savegame.txt"))
                 {
-                    Console.WriteLine("savegame.txt is missing data, ensure save file has not been modified.");
-                    Console.ReadKey(true);
-                    MainMenu();
-                }
-                else
-                {
-                    bool containsInt = int.TryParse(savePoint[1], out int savedPage);
-                    if (containsInt == true)
+                    string[] savePoint = File.ReadAllLines("savegame.txt").Where(line => line != "").ToArray();
+                    if (savePoint.Length < 3)
                     {
-                        page = int.Parse(savePoint[1]);
-                        Console.WriteLine("Loaded Game!");
-                        Console.ReadKey(true);
-                        GameplayLoop();
-                    }
-                    else
-                    {
-                        Console.WriteLine("Cannot find page number in savegame.txt, ensure save file has not been modified.");
+                        Console.WriteLine("savegame.txt is missing data, ensure save file has not been modified.");
                         Console.ReadKey(true);
                         MainMenu();
                     }
+                    
+                    
+                        bool containsInt = int.TryParse(savePoint[1], out int savedPage);
+                        if (containsInt == true)
+                        {
+                            page = int.Parse(savePoint[1]);
+
+                            if (page >= story.Length || page < 0)
+                            {
+                                Console.WriteLine("savegame.txt contains corrupted data, please check file integrity or delete savegame.txt");
+                                Console.ReadKey(true);
+                                Environment.Exit(0);
+                            }
+                            else
+                            {
+                                Console.WriteLine("Loaded Game!");
+                                Console.ReadKey(true);
+                                GameplayLoop();
+                            }     
+                        }
+                        else
+                        {
+                            Console.WriteLine("Cannot find page number in savegame.txt, ensure save file has not been modified.");
+                            Console.ReadKey(true);
+                            MainMenu();
+                        }
+                    
                 }
-            
+                else
+                {
+                    Console.WriteLine("savegame.txt cannot be found, ensure location has not been modified.");
+                    Console.ReadKey(true);
+                    MainMenu();
+                }
             }
             else if (input == ConsoleKey.N)
             {
@@ -397,6 +422,7 @@ namespace InteractiveFiction
                 LoadGame();
             } 
         } //Loads a previous saved game from savegame.txt.
+
         static void SaveGame()
         {
             Console.WriteLine("Save Game? This will overwrite current save. Y/N");
@@ -405,9 +431,8 @@ namespace InteractiveFiction
             {
                 string SavePoint = "savegame.txt";
 
-                MakeNewSaveHash();
-                string[] SaveData = { "Whispers Save Data", Convert.ToString(page), sgHash};
-                Console.WriteLine(SaveData);
+                MakeSaveHash();
+                string[] SaveData = new string [] { "Whispers Save Data", Convert.ToString(page), sgHash};
                 File.WriteAllLines(SavePoint, SaveData);
 
                 Console.WriteLine("Saved Game!");
@@ -423,6 +448,7 @@ namespace InteractiveFiction
                 SaveGame();
             }  
         } //Creates or overwrites savegame.txt with save data.
+
         static void GetFilePath()
         {
             string filePath = AppDomain.CurrentDomain.BaseDirectory;
@@ -439,6 +465,7 @@ namespace InteractiveFiction
                 }
             }
         } //Gets local file path for SaveGame, LoadGame, and ReadStoryText.
+
         static void QuickMenuColor() //Sets foreground color to green
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -457,61 +484,94 @@ namespace InteractiveFiction
 
         static void VerifyFileIntegrity()
         {
-            Console.WriteLine("Verifying story.txt integrity.");
-            if (defaultStoryHash != hashBuilder.ToString())
+            Console.WriteLine("\nVerifying story.txt integrity.");
+            if (!File.Exists(storyTXT))
             {
-                Console.WriteLine("The contents of story.txt have been modified, this may impact the stability of this application.");
+                Console.WriteLine("\nstory.txt cannot be found, ensure file location has not been modified.");
+            }
+            else if (defaultStoryHash != hashBuilder.ToString())
+            {
+                Console.WriteLine("\nThe contents of story.txt have been modified, this may impact the stability of this application.");
             }
             else
             {
-                Console.WriteLine("story.txt OK");
+                Console.WriteLine("\nstory.txt OK.");
             }
-            Console.WriteLine("Verifying savegame.txt integrity.");
-            if (lastSaveHash != newSaveHash.ToString())
+            
+            Console.WriteLine("\nVerifying savegame.txt integrity."); 
+            if (!File.Exists("savegame.txt"))
             {
-                Console.WriteLine("The contents of savegame have been modified, this may impact the stability of this application");
+                Console.WriteLine("\nsavegame.txt cannot be found, ensure file location has not been modified.");
             }
+            else if (lastSaveHash != newSaveHash.ToString())
+            {
+                Console.WriteLine("\nThe contents of savegame.txt have been modified, or no save exists.");
+            }
+            else
+            {
+                Console.WriteLine("\nsavegame.txt OK.");
+            }
+
             Console.ReadKey(true);
-        }
+        } //checks story.txt and savegame.txt integrity (File exists/file has been modified)
 
-        static void GetHash()
+        static void GetHash() //generates hashes from file data and compares it to existing or previously generated hashes
         {
-            string[] storyFilePlainText = File.ReadLines(storyTXT).ToArray();
-            foreach (string line in storyFilePlainText)
+            if(File.Exists(storyTXT))
             {
-                sb.Append(line);
+                string[] storyFilePlainText = File.ReadLines(storyTXT).ToArray(); //gets plain text from story.txt, including blank lines.
+                foreach (string line in storyFilePlainText)
+                {
+                    sb.Append(line);                                             //appends all lines together to form one long sequence.
+                }                                                                
+                var sha = new SHA256Managed();                                  //declaring a new sha256 hash manager
+                var allText = sb.ToString();                                    //converts long sequence into a string
+                var allTextBytes = Encoding.ASCII.GetBytes(allText);            //converts string into bytes by using ascii
+                var storyHash = sha.ComputeHash(allTextBytes);                  //generates hash characters from each byte
+                foreach(byte b in storyHash)
+                {
+                    hashBuilder.Append(b.ToString("x2"));                      //appends all bytes together to form a hash
+                }
             }
-            var sha = new SHA256Managed();
-            var allText = sb.ToString();
-            var allTextBytes = Encoding.ASCII.GetBytes(allText);
-            var storyHash = sha.ComputeHash(allTextBytes);
-            foreach(byte b in storyHash)
+            
+            if(File.Exists("savegame.txt"))
             {
-                hashBuilder.Append(b.ToString("x2"));
+                string[] saveGamePlainText = File.ReadLines("savegame.txt").ToArray(); //gets plain text from savegame.txt, including blank lines.
+                StringBuilder sb3 = new StringBuilder();                              //declaring a new stringbuilder to manage the sequence
+                for (int l = 0; l <= saveGamePlainText.Length-2; l++)       
+                {
+                    sb3.Append(saveGamePlainText[l]);                                //forming the sequence from every line except the last one
+                }
+
+                lastSaveHash = saveGamePlainText[saveGamePlainText.Length-1];       //grabbing the last line, this will be a previously generated hash if the user has saved before
+
+                var sha2 = new SHA256Managed();                                     //new sha256 manager
+                var saveText = sb3.ToString();                                     //sequence to string
+                var saveTextBytes = Encoding.ASCII.GetBytes(saveText);             //converting to bytes with ascii
+                var tempHash = sha2.ComputeHash(saveTextBytes);                    //generating hash characters
+                foreach (byte c in tempHash)
+                {
+                    newSaveHash.Append(c.ToString("x2"));                          //forming hash
+                }
+
+                
+                //the code below is for debugging and should be disabled by default
+
+                //Console.WriteLine(lastSaveHash);
+                //Console.WriteLine(newSaveHash.ToString());
+                //Console.WriteLine(hashBuilder.ToString());
+                //Console.ReadKey(true);
             }
+            
+        } //Reads all text in story.txt and makes a hash, then compares it against the default hash. Reads the first two lines in savegame.txt, and converts them to hash, then compares that hash to last line: the hash generated when the player saved last.
 
-            string[] saveGamePlainText = File.ReadLines("savegame.txt").ToArray();
-            for (int l = 0; l < saveGamePlainText.Length-1; l++)
-            {
-                sb.Append(saveGamePlainText[l]);
-            }
-
-            lastSaveHash = saveGamePlainText[saveGamePlainText.Length - 1];
-
-            var sha2 = new SHA256Managed();
-            var saveText = sb.ToString();
-            var saveTextBytes = Encoding.ASCII.GetBytes(saveText);
-            var tempHash = sha2.ComputeHash(saveTextBytes);
-            foreach (byte c in tempHash)
-            {
-                newSaveHash.Append(c.ToString("x2"));
-            }
-        }
-
-        static void MakeNewSaveHash()
+        static void MakeSaveHash() //Makes a new hash to write to savegame.txt, see GetHash() for code explanation
         {
             var sha3 = new SHA256Managed();
-            var toConvert = "Whispers Save Data" + Convert.ToString(page);
+            StringBuilder sb2 = new StringBuilder();
+            sb2.Append("Whispers Save Data");   //no loop, this is not generated from file data, instead the hasher uses what the first two lines of the save will be to generate this hash.
+            sb2.Append(Convert.ToString(page));
+            var toConvert = sb2.ToString();
             var toBytes = Encoding.ASCII.GetBytes(toConvert);
             var tempHash = sha3.ComputeHash(toBytes);
             StringBuilder outGoingHash = new StringBuilder();
@@ -520,9 +580,7 @@ namespace InteractiveFiction
                 outGoingHash.Append(d.ToString("x2"));
             }
 
-            Console.WriteLine(outGoingHash.ToString());
             sgHash = outGoingHash.ToString();
-            Console.ReadKey(true);
         }
     }
 }
